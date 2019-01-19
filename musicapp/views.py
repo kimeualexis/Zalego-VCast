@@ -1,7 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from . models import Album, Song, User
+from django.http import JsonResponse
+from django.db.models import Q
+from . models import Album, Song
 from .forms import UserForm, SongForm, AlbumForm
 
 
@@ -135,20 +137,67 @@ def create_song(request, album_id):
 
 
 # Delete an Album.
-"""
 def delete_album(request, album_id):
 	album = get_object_or_404(Album, pk=album_id)
 	album.delete()
 	albums = Album.objects.filter(user=request.user)
 	return render(request, 'musicapp/index.html', {'albums': albums})
-"""
 
 
 # Delete a Song.
-"""
 def delete_song(request, album_id, song_id):
 	album = get_object_or_404(Album, pk=album_id)
 	song = Song.objects.get(pk=song_id)
 	song.delete()
 	return render(request, 'musicapp/detail.html', {'album': album})
-"""
+
+
+#Favorite Song
+def favorite(request, song_id):
+    song = get_object_or_404(Song, pk=song_id)
+    try:
+        if song.is_favorite:
+            song.is_favorite = False
+        else:
+            song.is_favorite = True
+        song.save()
+    except (KeyError, Song.DoesNotExist):
+        return JsonResponse({'success': False})
+    else:
+        return JsonResponse({'success': True})
+
+
+# Favorite Album
+def favorite_album(request, album_id):
+    album = get_object_or_404(Album, pk=album_id)
+    try:
+        if album.is_favorite:
+            album.is_favorite = False
+        else:
+            album.is_favorite = True
+        album.save()
+    except (KeyError, Album.DoesNotExist):
+        return JsonResponse({'success': False})
+    else:
+        return JsonResponse({'success': True})
+
+
+#Songs
+def songs(request, filter_by):
+    if not request.user.is_authenticated:
+        return render(request, 'musicapp/login.html')
+    else:
+        try:
+            song_ids = []
+            for album in Album.objects.filter(user=request.user):
+                for song in album.song_set.all():
+                    song_ids.append(song.pk)
+            users_songs = Song.objects.filter(pk__in=song_ids)
+            if filter_by == 'favorites':
+                users_songs = users_songs.filter(is_favorite=True)
+        except Album.DoesNotExist:
+            users_songs = []
+        return render(request, 'musicapp/songs.html', {
+            'song_list': users_songs,
+            'filter_by': filter_by,
+        })

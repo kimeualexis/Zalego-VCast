@@ -1,4 +1,4 @@
-#!/home/ghost/Desktop/Vcast/castenv/bin/python3
+#!/home/ghost/Projects/Vcast/castenv/bin/python
 from django.core import management
 
 if __name__ == "__main__":
