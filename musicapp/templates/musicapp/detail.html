@@ -1,1 +1,77 @@
-{% extends 'musicapp/_base.html' %}{% block title %}{{ album }}{% endblock %}{% block albums_active %}active{% endblock %}{% block body %}<div class="container-fluid songs-container"><div class="row">    <!--Left Album info-->    <div class="col-sm-4 col-md-3">        <div class="panel panel-default">            <div class="panel-body">                <a href="{% url 'musicapp:detail' album.id %}">                    {% if album.cover %}                        <img src="{{ album.cover.url }}" class="img img-responsive">                        {% else %}                        <h4>No Image to Display</h4>                    {% endif %}                </a>            <h3>{{ album.album_title }}</h3>            <h4>{{ album.artist }}</h4>            </div>        </div>    </div><!--Right Song info--><div class="col-sm-8 col-md-9">    <ul class="nav nav-pills" style="margin-bottom: 10px;">        <li role="presentation" class="active"><a href="{% url 'musicapp:detail' album.id %}">View All</a> </li>        <li role="presentation"> <a href="{% url 'musicapp:create_song' album.id %}">Add New Song</a> </li>    </ul>    <div class="panel panel-default">        <div class="panel-body">            {% if error_message %}                <p><strong>{{ error_message }}</strong></p>            {% endif %}        <table class="table">            <thead>            <tr>                <th>Name</th>                <th>Audio</th>                <th>Actions</th>            </tr>            </thead>            <tbody>            {% for song in album.song_set.all %}                <tr>                <td>{{ song.song_name }}</td>                <td>                    <a target="_blank" href="{{ song.audio_file.url }}">                        <button type="button" class="btn btn-success btn-xs">                            <span class="glyphicon glyphicon-play"></span>&nbsp; Play                        </button>                    </a>                </td>                <td>                    <form action="" method="post" style="display: inline;">                        {% csrf_token %}                        <input type="hidden" name="song_id" value="song.id" />                        <button type="submit" class="btn btn-danger btn-xs">                            <span class="glyphicon glyphicon-remove"></span>&nbsp; Delete                        </button>                    </form>                </td>                </tr>            {% endfor %}            </tbody>        </table>        </div>    </div></div></div></div>{% endblock %}
+{% extends 'musicapp/_base.html' %}
+{% block title %}{{ album }}{% endblock %}
+{% block albums_active %}active{% endblock %}
+
+{% block body %}
+<div class="container-fluid songs-container">
+<div class="row">
+
+    <!--Left Album info-->
+    <div class="col-sm-4 col-md-3">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <a href="{% url 'musicapp:detail' album.id %}">
+                    {% if album.cover %}
+                        <img src="{{ album.cover.url }}" class="img img-responsive">
+                        {% else %}
+                        <h4>No Image to Display</h4>
+                    {% endif %}
+                </a>
+            <h3>{{ album.album_title }}</h3>
+            <h4>{{ album.artist }}</h4>
+            </div>
+        </div>
+    </div>
+
+<!--Right Song info-->
+<div class="col-sm-8 col-md-9">
+    <ul class="nav nav-pills" style="margin-bottom: 10px;">
+        <li role="presentation" class="active"><a href="{% url 'musicapp:detail' album.id %}">View All</a> </li>
+        <li role="presentation"> <a href="{% url 'musicapp:create_song' album.id %}">Add New Song</a> </li>
+    </ul>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+
+            {% if error_message %}
+                <p><strong>{{ error_message }}</strong></p>
+            {% endif %}
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Audio</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for song in album.song_set.all %}
+                <tr>
+                <td>{{ song.song_name }}</td>
+                <td>
+                    <a target="_blank" href="{{ song.audio_file.url }}">
+                        <button type="button" class="btn btn-success btn-xs">
+                            <span class="glyphicon glyphicon-play"></span>&nbsp; Play
+                        </button>
+                    </a>
+                </td>
+                <td>
+                    <form action="" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="song_id" value="{{ song.id }}" />
+                        <button type="submit" class="btn btn-danger btn-xs">
+                            <span class="glyphicon glyphicon-remove"></span>&nbsp; Delete
+                        </button>
+                    </form>
+                </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{% endblock %}
